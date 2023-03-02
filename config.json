@@ -1,0 +1,6 @@
+{
+    "port": "7687",
+    "user": "neo4j",
+    "pswd": "morpheus",
+    "import_Folder": "/neo4j/neo4j-enterprise-5.5.0/import"
+}
