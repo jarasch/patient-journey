@@ -1,5 +1,9 @@
 # Patient Journey on Synthetic Patient Data
-With this repository we want to provide solutions for storing highly heterogenous patient data. We provide queries and visualization solutions with Neo4j.
+With this repository I want to provide a solution for 
+- storing highly heterogenous patient data
+- queries 
+- visualization solutions like NeoDash or Neo4j Bloom
+- Graph Data Science (GDS)
 
 # Source Data
 Synthea<sup>TM</sup> is a Synthetic Patient Population Simulator. The goal is to output synthetic, realistic (but not real), patient data and associated health records in a variety of formats.
@@ -7,6 +11,7 @@ Synthea<sup>TM</sup> is a Synthetic Patient Population Simulator. The goal is to
 For more information please read [wiki](https://github.com/synthetichealth/synthea/wiki).
 
 ## Files (csv format)
+Synthea provides data in `JSON` as well as in `CSV`format. Currently, I intergrated the following entites into Neo4j:
 - Patients
 - Encounters
 - Conditions
@@ -21,9 +26,11 @@ For more information please read [wiki](https://github.com/synthetichealth/synth
 - Speciality
 - Organizations
 - Payers
+## Data Model
+![Patient Journey Data Model](patient-journey_data_model.png)
 ## Loading Data
-# Queries
 
 # Visualization
 ## NeoDash
+
 ## Bloom
