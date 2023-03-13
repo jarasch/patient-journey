@@ -5,6 +5,8 @@ With this repository I want to provide a solution for
 - visualization solutions like NeoDash or Neo4j Bloom
 - Graph Data Science (GDS)
 
+![Dashboard](screenshot_NeoDash.png)
+
 # Source Data
 Synthea<sup>TM</sup> is a Synthetic Patient Population Simulator. The goal is to output synthetic, realistic (but not real), patient data and associated health records in a variety of formats.
 
