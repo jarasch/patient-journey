@@ -1,0 +1,386 @@
+{
+  "title": "Patient Journey Dashboard",
+  "version": "2.4",
+  "settings": {
+    "pagenumber": 1,
+    "editable": true,
+    "fullscreenEnabled": false,
+    "parameters": {
+      "neodash_patient_gender": "F",
+      "neodash_patient_gender_display": "F",
+      "undefined": "diabetes",
+      "neodash_test": "Diabetes",
+      "neodash_condition_description_1": "Prediabetes",
+      "neodash_condition_description_1_display": "Prediabetes",
+      "neodash_condition_description_2": "Diabetes",
+      "neodash_condition_description_2_display": "Diabetes",
+      "neodash_condition_description_3": "Stroke",
+      "neodash_condition_description_3_display": "Stroke",
+      "neodash_allergy_description": "Fish (substance)",
+      "neodash_allergy_description_display": "Fish (substance)",
+      "neodash_testest": "p53, tcf7l2, brac2"
+    },
+    "downloadImageEnabled": true,
+    "queryTimeLimit": 1000,
+    "theme": "light"
+  },
+  "pages": [
+    {
+      "title": "General statistics",
+      "reports": [
+        {
+          "title": "Dead patients",
+          "query": "match(p:Patient) where p.deathdate IS NOT NULL return count(p)\n",
+          "width": 4,
+          "height": 2,
+          "x": 0,
+          "y": 4,
+          "type": "value",
+          "selection": {},
+          "settings": {
+            "textAlign": "center",
+            "verticalAlign": "middle"
+          },
+          "id": "61ae325e-6123-4769-bb5c-a363d8ca601b"
+        },
+        {
+          "title": "Gender distribution",
+          "query": "MATCH(p:Patient)\nRETURN p.gender as Gender, COUNT(p) as Patients\n\n",
+          "width": 6,
+          "height": 4,
+          "x": 4,
+          "y": 2,
+          "type": "pie",
+          "selection": {
+            "index": "Gender",
+            "value": "Patients",
+            "key": "(none)"
+          },
+          "settings": {
+            "legend": true,
+            "colors": "paired"
+          },
+          "id": "60de0df1-7180-43ff-9c8c-2bef4e3596ef"
+        },
+        {
+          "title": "Population",
+          "query": "MATCH(p:Patient) return count(p)\n",
+          "width": 4,
+          "height": 2,
+          "x": 0,
+          "y": 2,
+          "type": "value",
+          "selection": {},
+          "settings": {
+            "refreshButtonEnabled": true,
+            "textAlign": "center",
+            "verticalAlign": "middle",
+            "fontSize": 48
+          },
+          "id": "706b1e14-8d95-4c63-b009-2b030e73d38f"
+        },
+        {
+          "title": "Clinical conditions leading to drug prescriptions",
+          "query": "match(c:Condition)<-[:HAS_CONDITION]-(e:Encounter)-[:HAS_DRUG]->(d:Drug)\nwith c, d, count(*)  / toFloat(c.total_drug_pairings) as count, count(*) as displayValue order by count desc limit 100\nreturn c, d, apoc.create.vRelationship(c, \"NORMALIZEDFOLLOWS\", {value: count, number: displayValue}, d)",
+          "width": 24,
+          "height": 8,
+          "x": 0,
+          "y": 16,
+          "type": "sankey",
+          "selection": {
+            "Condition": "description",
+            "Drug": "description"
+          },
+          "settings": {
+            "nodePositions": {},
+            "colors": "paired"
+          },
+          "id": "8e87752f-9df9-482b-a3fc-3f3a1ee9bf35"
+        },
+        {
+          "title": "Prescribed drugs",
+          "query": "\n\nmatch(d:Drug) return d.description as name, apoc.node.degree(d) as prescribed order by prescribed desc\n",
+          "width": 6,
+          "height": 4,
+          "x": 0,
+          "y": 12,
+          "type": "table",
+          "selection": {},
+          "settings": {},
+          "id": "5d9a7053-7292-415f-9b68-add369cc8ef2"
+        },
+        {
+          "title": "Number of patients with Metformin or Insulin",
+          "query": "unwind [\"24 HR Metformin hydrochloride 500 MG Extended Release Oral Tablet\", \"insulin human  isophane 70 UNT/ML / Regular Insulin  Human 30 UNT/ML Injectable Suspension [Humulin]\"] as drugname\nMATCH (d:Drug {description: drugname})<-[:HAS_DRUG]-(e:Encounter)<-[:HAS_ENCOUNTER]-(p:Patient)\nRETURN d.description as drug, count(distinct(p)) as number_of_patients\n\n\n",
+          "width": 10,
+          "height": 4,
+          "x": 6,
+          "y": 12,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "columnWidths": "[4,1]"
+          },
+          "id": "4e1e21f8-3125-453d-b75f-72dd6b899c8c"
+        },
+        {
+          "title": "",
+          "query": "unwind ['860975', '106892'] as drugcode\nMATCH (d:Drug {code: drugcode})<-[:HAS_DRUG]-(e:Encounter)-[:HAS_CONDITION]->(c:Condition)\nWHERE NOT c.description contains 'finding'\nWITH d, c.description as condition, count(c) as condition_count order by condition_count desc\nWITH d, collect(condition)[..10] as conditions, collect(condition_count)[..10] as condition_counts\nRETURN d.description, conditions, condition_counts",
+          "width": 8,
+          "height": 4,
+          "x": 16,
+          "y": 12,
+          "type": "table",
+          "selection": {},
+          "settings": {},
+          "id": "04028f1b-cb89-40c7-9fce-4e729caccdc1"
+        },
+        {
+          "title": "",
+          "query": "# General Stats\n\n\n",
+          "width": 24,
+          "height": 2,
+          "x": 0,
+          "y": 0,
+          "type": "text",
+          "selection": {},
+          "settings": {
+            "backgroundColor": "#E6F8FF"
+          },
+          "id": "42d10103-c945-4a46-87ef-1a1b70ad8acf"
+        },
+        {
+          "title": "",
+          "query": "# Medications\n\n\n",
+          "width": 24,
+          "height": 2,
+          "x": 0,
+          "y": 10,
+          "type": "text",
+          "selection": {},
+          "settings": {
+            "backgroundColor": "#E6F8FF"
+          },
+          "id": "d975aa32-b5a4-4853-99f7-1a58b3712c90"
+        }
+      ]
+    },
+    {
+      "title": "Comorbidities Dashboard",
+      "reports": [
+        {
+          "title": "First clinical condition",
+          "query": "MATCH (n:`Condition`) \nWHERE toLower(toString(n.`description`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`description` as value,  n.`description` as display ORDER BY size(toString(value)) ASC LIMIT 5",
+          "width": 6,
+          "height": 2,
+          "x": 0,
+          "y": 2,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Node Property",
+            "entityType": "Condition",
+            "propertyType": "description",
+            "propertyTypeDisplay": "description",
+            "parameterName": "neodash_condition_description_1",
+            "id": "1",
+            "defaultValue": "Stress",
+            "backgroundColor": "rgba(250, 250, 250, 0.45)"
+          },
+          "id": "e2b5a4ae-6086-4a68-be52-a7453339475f"
+        },
+        {
+          "title": "Second clinical condition",
+          "query": "MATCH (n:`Condition`) \nWHERE toLower(toString(n.`description`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`description` as value,  n.`description` as display ORDER BY size(toString(value)) ASC LIMIT 5",
+          "width": 6,
+          "height": 2,
+          "x": 0,
+          "y": 4,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Node Property",
+            "entityType": "Condition",
+            "propertyType": "description",
+            "propertyTypeDisplay": "description",
+            "parameterName": "neodash_condition_description_2",
+            "id": "2",
+            "defaultValue": "Diabetes"
+          },
+          "id": "4f97af53-cbe5-4860-ae04-c7a741b31080"
+        },
+        {
+          "title": "Month in between conditions",
+          "query": "match path=(c1:Condition)<-[:HAS_CONDITION]-(e1:Encounter)-[:NEXT*1..200]->(e2:Encounter)-[:HAS_CONDITION]->(c2:Condition) \nwhere c1.description contains $neodash_condition_description_1 and c2.description contains $neodash_condition_description_2\nwith duration.between(date(e2.end), date(e1.start)) as duration, abs(duration.between(date(e2.end), date(e1.start)).months) as months\nRETURN months, count(abs(months))  order by months desc limit 20 \n\n",
+          "width": 18,
+          "height": 4,
+          "x": 6,
+          "y": 2,
+          "type": "bar",
+          "selection": {
+            "index": "count(abs(months))",
+            "value": "months",
+            "key": "(none)"
+          },
+          "settings": {
+            "colors": "paired"
+          },
+          "id": "ec0b8940-3655-4bb1-b489-2c885c45ca5b"
+        },
+        {
+          "title": "Co-morbidities of",
+          "query": "MATCH (n:`Condition`) \nWHERE toLower(toString(n.`description`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`description` as value,  n.`description` as display ORDER BY size(toString(value)) ASC LIMIT 5",
+          "width": 6,
+          "height": 4,
+          "x": 0,
+          "y": 6,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Node Property",
+            "entityType": "Condition",
+            "propertyType": "description",
+            "propertyTypeDisplay": "description",
+            "parameterName": "neodash_condition_description_3",
+            "id": "3",
+            "defaultValue": "Stress"
+          },
+          "id": "12ddb108-92b2-4008-a8fc-997c63a35c3c"
+        },
+        {
+          "title": "Co-morbidities of input",
+          "query": "match path=(c1:Condition)<-[:HAS_CONDITION]-(e1:Encounter)-[:NEXT*1..200]->(e2:Encounter)-[:HAS_CONDITION]->(c2:Condition) \nwhere c1.description contains $neodash_condition_description_3 and not c2.description contains \"finding\"\nRETURN c2.description as Comorbidity, count(c2.description) as Number order by count(c2.description) desc limit 10\n\n\n",
+          "width": 7,
+          "height": 4,
+          "x": 6,
+          "y": 6,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "autorun": false
+          },
+          "id": "225b4053-bc71-4245-8b3a-d78959a6ff95"
+        },
+        {
+          "title": "Month between Prediabetes and Diabetes",
+          "query": "match path=(c1:Condition)<-[:HAS_CONDITION]-(e1:Encounter)-[:NEXT*1..]->(e2:Encounter)-[:HAS_CONDITION]->(c2:Condition) where c1.description='Prediabetes' and c2.description='Diabetes'\nwith duration.between(date(e2.end), date(e1.start)) as duration, abs(duration.between(date(e2.end), date(e1.start)).months) as months\nRETURN months, count(abs(months)) order by months asc",
+          "width": 24,
+          "height": 4,
+          "x": 0,
+          "y": 10,
+          "type": "bar",
+          "selection": {
+            "index": "months",
+            "value": "count(abs(months))",
+            "key": "(none)"
+          },
+          "settings": {
+            "colors": "paired"
+          },
+          "id": "2a74272d-ef69-4d1b-8ab0-2c82164644e7"
+        },
+        {
+          "title": "Journeys between Prediabetes and Diabetes",
+          "query": "\nmatch path=(c1:Condition)<-[:HAS_CONDITION]-(e1:Encounter)-[:NEXT*1..]->(e2:Encounter)-[:HAS_CONDITION]->(c2:Condition) where c1.description='Prediabetes' and c2.description='Diabetes'\nreturn path limit 10\n\n\n",
+          "width": 18,
+          "height": 4,
+          "x": 0,
+          "y": 14,
+          "type": "graph",
+          "selection": {
+            "Condition": "description",
+            "Encounter": "(label)"
+          },
+          "settings": {
+            "nodeColorScheme": "paired",
+            "nodeLabelFontSize": 6,
+            "defaultNodeSize": 4
+          },
+          "id": "4052f859-e405-4b7e-a29a-adf7ca1d8b3e",
+          "schema": [
+            [
+              "Condition",
+              "code",
+              "total_drug_pairings",
+              "start",
+              "description",
+              "isEnd"
+            ],
+            [
+              "Encounter",
+              "baseCost",
+              "code",
+              "claimCost",
+              "start",
+              "description",
+              "end",
+              "coveredAmount",
+              "id",
+              "class",
+              "isEnd"
+            ]
+          ]
+        },
+        {
+          "title": "",
+          "query": "# Co-morbidities",
+          "width": 24,
+          "height": 2,
+          "x": 0,
+          "y": 0,
+          "type": "text",
+          "selection": {},
+          "settings": {
+            "backgroundColor": "#E6F8FF"
+          },
+          "id": "22b5a781-c9ac-4207-9e20-1c8490ec1401"
+        }
+      ]
+    },
+    {
+      "title": "Test",
+      "reports": [
+        {
+          "title": "",
+          "query": "MATCH (n:`undefined`) \nWHERE toLower(toString(n.`undefined`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`undefined` as value,  n.`undefined` as display ORDER BY size(toString(value)) ASC LIMIT 5",
+          "width": 12,
+          "height": 4,
+          "x": 0,
+          "y": 0,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Free Text",
+            "entityType": "testest",
+            "parameterName": "neodash_testest"
+          },
+          "id": "ba7dfea7-78ae-4037-8bb8-91ee9b11259e"
+        },
+        {
+          "title": "Working with free text",
+          "query": "return split($neodash_testest, ',')[0] as x\n\n\n\n",
+          "width": 12,
+          "height": 4,
+          "x": 12,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {},
+          "id": "69a817c5-0aa6-4662-884f-c0c06a000e58"
+        }
+      ]
+    }
+  ],
+  "parameters": {},
+  "extensions": {
+    "advanced-charts": {
+      "active": true
+    },
+    "styling": {
+      "active": true
+    },
+    "active": true,
+    "activeReducers": []
+  },
+  "uuid": "c4af9cbb-77d1-4d6a-a9a9-0ba7446b38b4"
+}
